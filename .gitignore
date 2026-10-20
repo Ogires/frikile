@@ -1,0 +1,6 @@
+node_modules/
+.wrangler/
+.dev.vars
+data/palabras.json
+data/propuestas*.json
+docs/guia-implementacion-detallada.*
