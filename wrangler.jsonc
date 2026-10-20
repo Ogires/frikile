@@ -14,5 +14,5 @@
     }
   ],
   "kv_namespaces": [{ "binding": "KV", "id": "f56a4b8538d9426a935e20dc0ee28aca" }],
-  "vars": { "GROQ_MODEL": "openai/gpt-oss-120b", "FECHA_LANZAMIENTO": "2026-10-20" }
+  "vars": { "GROQ_MODEL": "openai/gpt-oss-120b", "FECHA_LANZAMIENTO": "2026-10-21" }
 }
