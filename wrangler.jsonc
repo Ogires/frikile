@@ -1,0 +1,18 @@
+{
+  "name": "frikile",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public" },
+  "routes": [{ "pattern": "frikile.webninja.fyi", "custom_domain": true }],
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "frikile",
+      "database_id": "7d299759-269e-43ad-9f63-c0fcccec196b",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "kv_namespaces": [{ "binding": "KV", "id": "f56a4b8538d9426a935e20dc0ee28aca" }],
+  "vars": { "GROQ_MODEL": "openai/gpt-oss-120b", "FECHA_LANZAMIENTO": "2026-10-20" }
+}
