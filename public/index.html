@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Frikile — el Wordle de las palabras frikis</title>
+  <meta name="description" content="Una palabra friki al día, 6 intentos, pistas del Oráculo y ranking de rachas. Grogu, Chocobo, Tardis... ¿cuántos intentos necesitas?" />
+  <meta name="theme-color" content="#050a07" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Frikile — el Wordle de las palabras frikis" />
+  <meta property="og:description" content="Una palabra friki al día. 6 intentos. Pistas del Oráculo y ranking de rachas." />
+  <meta property="og:image" content="https://frikile.webninja.fyi/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta property="og:url" content="https://frikile.webninja.fyi/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Press+Start+2P&family=VT323&display=swap" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="crt" aria-hidden="true"></div>
+
+  <div class="app" id="app">
+    <header class="barra">
+      <button class="icono" id="btn-ayuda" type="button" aria-label="Cómo se juega">?</button>
+      <div class="marca">
+        <h1 class="logo" aria-label="Frikile">FRIK<span>ILE</span></h1>
+        <p class="numero">#<span id="numero">--</span><span class="cursor" aria-hidden="true">_</span></p>
+      </div>
+      <button class="icono" id="btn-ranking" type="button" aria-label="Ranking">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 15h4V8H1zm5 0h4V2H6zm5 0h4V5h-4z" fill="currentColor" /></svg>
+      </button>
+    </header>
+
+    <p class="categoria" id="categoria" aria-live="polite">&gt; cargando cartucho…</p>
+
+    <main class="juego">
+      <div class="tablero" id="tablero" role="grid" aria-label="Tablero"></div>
+
+      <section class="oraculo" id="oraculo" hidden aria-live="polite">
+        <h2>🔮 El Oráculo dice…</h2>
+        <ol id="pistas"></ol>
+      </section>
+    </main>
+
+    <div class="teclado" id="teclado" aria-label="Teclado"></div>
+  </div>
+
+  <div class="toasts" id="toasts" role="status" aria-live="assertive"></div>
+
+  <section class="mantenimiento" id="mantenimiento" hidden>
+    <pre aria-hidden="true">
+  ___________
+ |  _______  |
+ | | X   X | |
+ | |  ___  | |
+ | |_______| |
+ |___________|</pre>
+    <h2>El Oráculo está en mantenimiento</h2>
+    <p>Algún Sith ha tropezado con el cable. Prueba otra vez en un momento.</p>
+    <button class="boton" id="btn-reintentar" type="button">&gt; REINTENTAR</button>
+  </section>
+
+  <!-- Cómo se juega -->
+  <dialog class="modal" id="modal-ayuda" aria-labelledby="ayuda-titulo">
+    <button class="cerrar" type="button" data-cerrar aria-label="Cerrar">×</button>
+    <h2 tabindex="-1" id="ayuda-titulo">MANUAL DEL JUGADOR</h2>
+    <p>Adivina la <strong>palabra friki del día</strong> en 6 intentos. Te damos la categoría y la longitud; cualquier combinación de letras vale como intento.</p>
+    <div class="ejemplo" aria-hidden="true">
+      <span class="casilla" data-color="verde">G</span><span class="casilla" data-color="gris">A</span><span class="casilla" data-color="amarillo">N</span><span class="casilla" data-color="gris">D</span><span class="casilla" data-color="gris">O</span>
+    </div>
+    <ul class="leyenda">
+      <li><span class="casilla mini" data-color="verde">G</span> Verde lleno: letra en su sitio.</li>
+      <li><span class="casilla mini" data-color="amarillo">N</span> Ámbar rayado: está, pero en otra posición.</li>
+      <li><span class="casilla mini" data-color="gris">A</span> Gris apagado: no está.</li>
+    </ul>
+    <p>Tras 3 fallos el <strong>Oráculo</strong> suelta una pista; tras 5, otra más clara. Las tildes no cuentan, la <strong>Ñ</strong> sí.</p>
+    <p class="nota">Una palabra nueva cada medianoche (hora peninsular). Gana días seguidos para subir en el ranking de rachas 🔥</p>
+  </dialog>
+
+  <!-- Ranking suelto -->
+  <dialog class="modal" id="modal-ranking" aria-labelledby="ranking-titulo">
+    <button class="cerrar" type="button" data-cerrar aria-label="Cerrar">×</button>
+    <h2 tabindex="-1" id="ranking-titulo">HIGH SCORES</h2>
+    <div class="ranking" data-ranking></div>
+  </dialog>
+
+  <!-- Final de partida -->
+  <dialog class="modal" id="modal-final" aria-labelledby="final-titulo">
+    <button class="cerrar" type="button" data-cerrar aria-label="Cerrar">×</button>
+    <h2 tabindex="-1" id="final-titulo" class="final-titulo">GAME OVER</h2>
+    <p class="final-sub" id="final-sub"></p>
+    <p class="palabra-final" id="palabra-final"></p>
+    <p class="definicion" id="definicion"></p>
+
+    <pre class="compartir-preview" id="compartir-preview" aria-label="Resultado para compartir"></pre>
+    <button class="boton" id="btn-compartir" type="button">&gt; COMPARTIR</button>
+
+    <p class="proxima">Próximo Frikile en <span id="cuenta-atras">--:--:--</span></p>
+
+    <form class="alias" id="form-alias" autocomplete="off">
+      <label for="input-alias">Tu alias en el ranking</label>
+      <div class="alias-fila">
+        <input id="input-alias" name="alias" maxlength="16" minlength="3" required spellcheck="false" />
+        <button class="boton mini" type="submit">GUARDAR</button>
+      </div>
+      <small>3-16 letras, números o _</small>
+    </form>
+
+    <div class="ranking" data-ranking></div>
+  </dialog>
+
+  <footer class="pie">
+    <p>Un Cloudflare Worker, una D1 y demasiadas horas de anime. <a href="https://github.com/Ogires/frikile">Código fuente</a></p>
+  </footer>
+
+  <template id="tpl-ranking">
+    <div class="pestanas" role="tablist">
+      <button type="button" role="tab" data-tipo="hoy" aria-selected="true">HOY</button>
+      <button type="button" role="tab" data-tipo="rachas" aria-selected="false">RACHAS</button>
+    </div>
+    <table class="tabla">
+      <thead><tr></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="vacio" hidden></p>
+  </template>
+
+  <script src="/app.js"></script>
+</body>
+</html>
