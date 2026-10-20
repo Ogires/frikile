@@ -4,7 +4,7 @@ import { diaDeHoy, numeroDelDia } from "./fechas";
 import { colorear, contarFallos, esUuid, leerPartida, registrarIntento, type Partida } from "./partida";
 import { obtenerPistas, pistasDesbloqueadas } from "./pistas";
 import { checkRateLimit } from "./rate-limit";
-import { guardarAlias, rankingHoy, rankingRachas, validarAlias } from "./ranking";
+import { guardarAlias, leerAlias, rankingHoy, rankingRachas, validarAlias } from "./ranking";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -47,9 +47,10 @@ async function manejarHoy(url: URL, env: Env): Promise<Response> {
   const jugador = url.searchParams.get("jugador");
   if (!esUuid(jugador)) return json({ error: "jugador" }, 400);
   const { fecha, numero, entrada } = await contextoDelDia(env);
-  const partida = await leerPartida(env.DB, jugador, fecha);
+  const [partida, alias] = await Promise.all([leerPartida(env.DB, jugador, fecha), leerAlias(env.DB, jugador)]);
   return json({
     numero,
+    alias,
     longitud: entrada.palabra.length,
     categoria: entrada.categoria,
     partida: partida ? await vistaPartida(env, fecha, entrada, partida) : null,

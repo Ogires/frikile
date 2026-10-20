@@ -43,6 +43,17 @@ describe("GET /api/hoy", () => {
     expect(JSON.parse(texto)).toMatchObject({ numero: expect.any(Number), longitud: e.palabra.length, categoria: e.categoria, partida: null });
     expect(texto).not.toContain(e.palabra);
   });
+  it("devuelve el alias guardado (null si el jugador es nuevo)", async () => {
+    const nuevo = await (await SELF.fetch(`${base}/api/hoy?jugador=${J}`)).json<any>();
+    expect(nuevo.alias).toBeNull();
+    await SELF.fetch(`${base}/api/alias`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jugador: J, alias: "Ñoño_Sith" }),
+    });
+    const conAlias = await (await SELF.fetch(`${base}/api/hoy?jugador=${J}`)).json<any>();
+    expect(conAlias.alias).toBe("Ñoño_Sith");
+  });
   it("recupera la partida en curso con colores", async () => {
     const e = await solucion();
     await intentar(fallo(e.palabra.length));

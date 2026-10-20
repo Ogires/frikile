@@ -285,6 +285,8 @@ async function cargar({ silencioso = false } = {}) {
     estado.numero = datos.numero;
     estado.longitud = datos.longitud;
     estado.categoria = datos.categoria;
+    // El alias vive en D1: si se borró el localStorage, se recupera de ahí
+    if (datos.alias) guardar("frikile:alias", datos.alias);
     aplicarPartida(datos.partida);
     estado.actual = estado.actual.slice(0, estado.longitud);
     pintarTodo();

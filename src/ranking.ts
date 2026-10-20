@@ -55,3 +55,8 @@ export async function guardarAlias(db: D1Database, jugadorId: string, alias: str
     .bind(jugadorId, alias, ahoraMs)
     .run();
 }
+
+export async function leerAlias(db: D1Database, jugadorId: string): Promise<string | null> {
+  const fila = await db.prepare("SELECT alias FROM jugadores WHERE id = ?").bind(jugadorId).first<{ alias: string }>();
+  return fila?.alias ?? null;
+}
