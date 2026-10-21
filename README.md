@@ -33,11 +33,11 @@ El Wordle de las palabras frikis: una palabra al día, igual para todo el mundo,
 │ · evaluación de colores en servidor             │
 │ · partidas con bloqueo optimista                │
 │ · rachas sin cron · ranking del día             │
-│ · rate limit 30 intentos/min/IP                 │
+│ · rate limit ~30 intentos/min/IP                │
 └──┬──────────────┬─────────────────┬─────────────┘
    │ D1 (SQLite)  │ KV              │ Groq (LLM)
    palabras       pistas del día    1 llamada al día
-   jugadores      rate limit
+   jugadores
    partidas
 ```
 
@@ -107,6 +107,22 @@ Diseño completo en [`docs/plans/`](docs/plans/).
 ## Hecho con
 
 TypeScript · Cloudflare Workers, D1 y KV · Groq · Vitest con `@cloudflare/vitest-plugin` · GitHub Actions. Y demasiadas horas de Final Fantasy.
+
+## Incidencias y decisiones
+
+### 2026-10-21 · El rate limit no frenaba nada en producción
+
+**Qué pasó.** El rate limit original guardaba un contador por IP en Cloudflare KV (`get` → `+1` → `put`). Al verificarlo en producción, 40 peticiones seguidas desde la misma IP pasaron todas, y en KV quedaron contadores de **6 y 5**.
+
+**Por qué.** KV no es atómico y cachea las lecturas, incluso las de claves que aún no existen. Peticiones casi simultáneas leen el mismo valor viejo y se pisan los incrementos. Los tests no lo detectaban porque el KV local de miniflare sí es consistente: el mock reproducía nuestra suposición, no la realidad.
+
+**Qué se hizo.**
+1. Frikile nació ya con ventana fija (clave `rl:{ip}:{nº de ventana}`) para evitar el TTL renovado que tenía Excusotron, pero seguía apoyado en KV y tampoco frenaba.
+2. Solución actual: el [binding de Rate Limiting de Workers](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) (`ratelimits` en `wrangler.jsonc`), gratuito.
+
+**Lo que se asume.** El binding es *aproximado por diseño*: cuenta por máquina y se sincroniza de forma asíncrona. Medido en producción: con límite 30, solo bloqueó 9 de 230 peticiones seguidas. Frena el abuso masivo, no cuenta con exactitud. Aquí basta, porque un abuso solo permite probar más palabras por minuto. Sacar la palabra con UUID desechables ya era posible: es un riesgo asumido (ver Anti-trampas). Para un contador exacto, la herramienta correcta es un Durable Object.
+
+Por esta incidencia, la suite pasó de 75 a 74 tests: con el binding, el cambio de ventana no se puede probar sin esperar al reloj real.
 
 ## Licencia
 
