@@ -59,7 +59,7 @@ async function manejarHoy(url: URL, env: Env): Promise<Response> {
 
 async function manejarIntento(request: Request, env: Env): Promise<Response> {
   const ip = request.headers.get("cf-connecting-ip") ?? "0.0.0.0";
-  const rl = await checkRateLimit(env.KV, ip, 30, 60);
+  const rl = await checkRateLimit(env.RL, ip);
   if (!rl.allowed) return json({ error: "nazgul", segundos: rl.retryAfter }, 429);
 
   const body = (await request.json().catch(() => null)) as { jugador?: unknown; intento?: unknown } | null;

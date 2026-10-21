@@ -57,7 +57,7 @@ Decisiones de diseño:
 | Leer la palabra en el JS, la red o el repo | No: solo está en D1 y el catálogo no es público (ver abajo) |
 | Inventarse un tiempo de 3 segundos | No: el cronómetro es del servidor |
 | Pedir las pistas antes de tiempo | No: solo llegan en la respuesta cuando están desbloqueadas |
-| Fuerza bruta de intentos | Limitado a 30/min por IP |
+| Fuerza bruta de intentos | Frenado por IP (~30/min, binding de Rate Limiting de Workers: aproximado por diseño) |
 | Jugar con un UUID desechable para descubrir la palabra y luego "ganar" con el bueno | Sí. Cerrarlo exigiría login, y no compensa en un juego así. Asumido |
 
 ## Catálogo privado
@@ -86,7 +86,7 @@ npx wrangler d1 migrations apply frikile --local
 npm run seed -- --local data/palabras.ejemplo.json
 # opcional, para pistas con IA: crea .dev.vars con GROQ_API_KEY=... (console.groq.com/keys)
 npm run dev        # http://localhost:8787
-npm test           # 75 tests sobre el runtime real de Workers (D1 y KV incluidos)
+npm test           # 74 tests sobre el runtime real de Workers (D1 y KV incluidos)
 npm run typecheck
 ```
 

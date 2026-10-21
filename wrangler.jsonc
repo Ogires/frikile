@@ -14,5 +14,6 @@
     }
   ],
   "kv_namespaces": [{ "binding": "KV", "id": "f56a4b8538d9426a935e20dc0ee28aca" }],
+  "ratelimits": [{ "name": "RL", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],
   "vars": { "GROQ_MODEL": "openai/gpt-oss-120b", "FECHA_LANZAMIENTO": "2026-10-21" }
 }
