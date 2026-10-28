@@ -4,3 +4,6 @@ node_modules/
 data/palabras.json
 data/propuestas*.json
 docs/guia-implementacion-detallada.*
+
+# Plan de implementación: notas de trabajo para el agente, no se publica
+docs/plans/*-mv1.md
